@@ -1,21 +1,4 @@
-match([H|_],0,H) :-
-    !.
-match([_|T],N,H) :-
-    N > 0, %add for loop prevention  
-    N1 is N-1, %The base case is thus that the index is 0 in which case you return the head, otherwise you query for the i-1-th element of the tail. This is also a more declarative approach.
-    match(T,N1,H).
-
-
-indexOf([Element|_], Element, 0). % We found the element
-indexOf([_|Tail], Element, Index):-
-  indexOf(Tail, Element, Index1), % Check in the tail of the list
-  Index is Index1+1.  % and increment the resulting index
-
-indices(List, E, Is) :-
-    findall(N, nth1(N, List, E), Is).
-
-
-/* PartE Funcional */
+/* Parte Funcional */
 
 codifica_rec(_,[],[]).  %recursao final onde a lista de palavras = vazia, pois já codificamos todas as letras para codigos
 codifica_rec([(A,B) | Xs], [H|T], [C1 |Rc]) :-
@@ -35,13 +18,61 @@ descodifica_1letra([(L,C) | R], C, L) :- !.
 descodifica_1letra([_|R], C,L) :- descodifica_1letra(R,C,L).
 
 
-gera_palavras([(A,B) | Xs], [H|T], [R|Q]) :- 
-    codifica_rec([(A,B) | Xs], [H|T], [R|Q]).
+/*gera_palavras(InList,X) :-
+    splitSet(InList,_,SubList),
+    SubList = [_|_],     
+    permute(SubList,X).
 
-%findall(S, timetable(S), AllSolutions).
+splitSet([ ],[ ],[ ]).
+splitSet([H|T],[H|L],R) :-
+    splitSet(T,L,R).
+splitSet([H|T],L,[H|R]) :-
+    splitSet(T,L,R).
 
+permute([ ],[ ]) :- !.
+permute(L,[X|R]) :-
+    omit(X,L,M),
+    permute(M,R).
+
+omit(H,[H|T],T).
+omit(X,[H|L],[H|R]) :-
+    omit(X,L,R). */
+
+tamanho_lista(Xs,L) :- tamanho_lista(Xs,0,L) .
+tamanho_lista( []     , L , L ) .
+tamanho_lista( [_|Xs] , T , L ) :-
+  T1 is T+1 ,
+  tamanho_lista(Xs,T1,L).
+
+gera_palavras_tamanho([X|Xs], L, Y) :-
+    gera_palavras([X|Xs],Y),
+    tamanho_lista(Y,R),
+    R =< L.
+    
+gera_palavras([H|_], [H]).
+
+gera_palavras([_|T], C) :-   % Combinations of the tail w/o head
+   gera_palavras(T, C).
+
+gera_palavras([H|T], [H|C]) :-  % Combinations of the tail including head
+   gera_palavras(T, C).
+
+sel(E, [E|L], L).
+sel(E, [X|L], [X|M]) :- sel(E, L, M).
+
+
+%gera_palavras() :-                              %combinations of the head including tail
+
+
+
+
+%gera palavras menor que x, mesmos argumentos + mais nunero maximo de letras, chamamos gera palavras, e depois ver se a lista é menor que esse numero ou nao
+%tentar gerar por tamanho
+%gera_palavras([a,b],X)
 
 % exemplo 1 do enunciado [(a, [0,1,0]),(c, [0,1]),(j, [0,0,1]),(l, [1,0]),(p, [0]),(s, [1]),(v, [1,0,1])]
 % exempo 2 do enunciado [(a, [0,1,1,0]),(b, [0,1,1,1,1,1]),(c, [1,1,0,0,1,1,1,1]),(f, [1,0,1,1,1,0]),(j, [0,1,0]),(l, [0,1,0,0]),(r, [0,1,1,1,0])]
 %gera_palavras([(a, [0,1,0]),(c, [0,1]),(j, [0,0,1]),(l, [1,0]),(p, [0]),(s, [1]),(v, [1,0,1])],X,Y).
+%gera_palavras([a,b,c],X), codifica_rec([(a, [0,1,0]),(c, [0,1])],X,Y).
 %gera_palavras([(a, [0,1,0]),(c, [0,1])],X,Y).
+%findall(X, gera_palavras_tamanho([a,b,c,d],3, X), L).  
