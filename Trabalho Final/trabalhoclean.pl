@@ -17,34 +17,7 @@ descodifica_rec([(A,B) | Xs], [H|T], [C1 |Rc]) :-
 descodifica_1letra([(L,C) | R], C, L) :- !.
 descodifica_1letra([_|R], C,L) :- descodifica_1letra(R,C,L).
 
-
-/*gera_palavras(InList,X) :-
-    splitSet(InList,_,SubList),
-    SubList = [_|_],     
-    permute(SubList,X).
-
-splitSet([ ],[ ],[ ]).
-splitSet([H|T],[H|L],R) :-
-    splitSet(T,L,R).
-splitSet([H|T],L,[H|R]) :-
-    splitSet(T,L,R).
-
-permute([ ],[ ]) :- !.
-permute(L,[X|R]) :-
-    omit(X,L,M),
-    permute(M,R).
-
-omit(H,[H|T],T).
-omit(X,[H|L],[H|R]) :-
-    omit(X,L,R). */
-
-tamanho_lista(Xs,L) :- tamanho_lista(Xs,0,L) .
-tamanho_lista( []     , L , L ) .
-tamanho_lista( [_|Xs] , T , L ) :-
-  T1 is T+1 ,
-  tamanho_lista(Xs,T1,L).
-
-gera_palavras_tamanho([X|Xs], L, Y) :-
+/*gera_palavras_tamanho([X|Xs], L, Y) :-
     gera_palavras([X|Xs],Y),
     tamanho_lista(Y,R),
     R =< L.
@@ -55,12 +28,7 @@ gera_palavras([_|T], C) :-   % Combinations of the tail w/o head
    gera_palavras(T, C).
 
 gera_palavras([H|T], [H|C]) :-  % Combinations of the tail including head
-   gera_palavras(T, C).
-
-%-----------------------------------------%
-rev(L, R) :- rev(L, [], R).
-rev([], R, R).
-rev([A|B], X, R) :- rev(B, [A|X], R).
+   gera_palavras(T, C).*/
 %------------------------------------------%
 /*wordlist(N, L) :-
     wordlist(N, [], L, []).
@@ -77,15 +45,45 @@ wordfold([], _, _, L, L).
 wordfold([C|CS], N1, CT, L, T) :-
     wordlist(N1, [C|CT], L, L2),
     wordfold(CS, N1, CT, L2, T).*/
-letter(X) :- member(X, [a, b, c]).
 
-word(0, []).
-word(N,[C|W]) :-   %M deve ser limite minimo e N limite maximo
+word(L,0, []).
+word(L,N,[C|W]) :-   
     N > 0,
     N1 is N-1,
-    letter(C),
-    word(N1, W).
+    member(C,L),
+    word(L,N1, W).
+    
+%letter(X,Y) :- member(X, Y).   %em backtrack member faz a; b;c
 
+gera_palavras(L,N,M,[]).
+gera_palavras(L,N, M,[C|W]) :-   %N deve ser limite minimo e M limite maximo
+    N =< M,
+    N1 is N+1,
+    member(C,L),
+    gera_palavras(L,N1,M, W).    %chamada recursiva
+
+%Predicado que retorna a lista de letras existentes no dicionário pretendido
+%Irá ser usado para gerar todas as palavras comas respeticas letras
+%Exemplo 1 do enunciado vai retornar -> X = [a,c,j,l,p,s,v]
+%Exemplo 2 do enunciado vai retornar -> X = [a,b,c,f,j,l,r]
+prefixo([],[]).
+prefixo([(X,_)|T], [X|T2]):- prefixo(T,T2).
+
+%Facto Dicionário atribui ao valor X a lista que contém todos os códigos na lista Y
+dicionario(X,Y).
+
+
+get_palavras_todas(L,N,M,X,Y) :- findall(X,gera_palavras(L,N,M,X),Y).
+    /*gera_palavras(L,N,M,X), 
+    codifica_rec(L,X,Y).*/
+
+%codificação_palavras(L,N,M,X) :- gera_palavras(L,N,M,X).
+ambiguo(L,P,P1,P2,P3) :-
+    prefixo(L,P),
+    gera_palavras(P,1,7,P1),
+    codifica_rec(L,P1,P2),
+    descodifica_rec(L,P2,P3),
+    P1 \= P3.  % The reading in classical logic (or even constructive logic?) would be "in any solution, P1 and P3 must be different!"
 
 
 
@@ -99,3 +97,5 @@ word(N,[C|W]) :-   %M deve ser limite minimo e N limite maximo
 %gera_palavras([a,b,c],X), codifica_rec([(a, [0,1,0]),(c, [0,1])],X,Y).
 %gera_palavras([(a, [0,1,0]),(c, [0,1])],X,Y).
 %findall(X, gera_palavras_tamanho([a,b,c,d],3, X), L).  
+
+%dicionario(DIC), !, words(DIC, 7, 1, W), encode_word(DIC, W, C), decode_word(DIC, C, W2), W \= W2.
