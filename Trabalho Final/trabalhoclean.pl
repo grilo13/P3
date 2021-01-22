@@ -57,11 +57,34 @@ gera_palavras([_|T], C) :-   % Combinations of the tail w/o head
 gera_palavras([H|T], [H|C]) :-  % Combinations of the tail including head
    gera_palavras(T, C).
 
-sel(E, [E|L], L).
-sel(E, [X|L], [X|M]) :- sel(E, L, M).
+%-----------------------------------------%
+rev(L, R) :- rev(L, [], R).
+rev([], R, R).
+rev([A|B], X, R) :- rev(B, [A|X], R).
+%------------------------------------------%
+/*wordlist(N, L) :-
+    wordlist(N, [], L, []).
 
+wordlist(0, R, [W|T], T) :-
+    rev(R, W),
+    !.
+wordlist(N, C, L, T) :-
+    N > 0,
+    N1 is N-1,
+    wordfold([a,b,c], N1, C, L, T).
 
-%gera_palavras() :-                              %combinations of the head including tail
+wordfold([], _, _, L, L).
+wordfold([C|CS], N1, CT, L, T) :-
+    wordlist(N1, [C|CT], L, L2),
+    wordfold(CS, N1, CT, L2, T).*/
+letter(X) :- member(X, [a, b, c]).
+
+word(0, []).
+word(N,[C|W]) :-   %M deve ser limite minimo e N limite maximo
+    N > 0,
+    N1 is N-1,
+    letter(C),
+    word(N1, W).
 
 
 
